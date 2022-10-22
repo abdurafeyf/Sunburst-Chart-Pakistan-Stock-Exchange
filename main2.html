@@ -1,0 +1,295 @@
+<html>
+<head>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style id="compiled-css" type="text/css">
+    html, body {
+      height: 100%;
+    }
+    path {<!--  w   w w .  d    e m  o   2 s .   c   o  m-->
+    stroke: #fff;
+    }
+    /* legend */
+    #legend {
+      background-color:yellow;
+      line-height: 1.4em;
+    }
+    .legend {
+      font-size: 14px;
+      float: left;
+      margin-right:1em;
+    }
+    div#legend .rect {
+      width: 10px;
+      height: 10px;
+      margin-right: 4px;
+      display: inline-block;
+    }
+    .clearfix::after {
+      content: " ";
+      display: block;
+      height: 0;
+      clear: both;
+    }
+    rect {
+      stroke-width: 2;
+    }
+    div.tooltip {
+      position: absolute;
+      width: 200px;
+      height: auto;
+      padding: 10px;
+      display: none;
+      background-color: white;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+      border-radius: 10px;
+      -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+      -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    div.tooltip p {
+      margin: 0;
+      font-family: sans-serif;
+      font-size: 16px;
+      line-height: 20px;
+    }
+
+  </style>
+</head>
+<body>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>D3.js Donut Chart</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Pacifico" rel="stylesheet">
+</head>
+<body>
+<div id="chart"></div>
+<div id="legend"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+</body>
+</html>
+<script type='text/javascript'>
+  // define json object
+  var root = {
+    "name": "TOTAL",
+    "children": [
+      {
+        "name": "UNASSIGNED",
+        "children": [
+          {"name": "high", "size": 170},
+          {"name": "med", "size": 701},
+          {"name": "low", "size": 410}
+        ]
+      },
+      {
+        "name": "CLOSED",
+        "children": [
+          {"name": "high", "size": 1701},
+          {"name": "med", "size": 584},
+          {"name": "low", "size": 606}
+        ]
+      },
+      {
+        "name": "ATTACHED",
+        "children": [
+          {"name": "high", "size": 220},
+          {"name": "med", "size": 179},
+          {"name": "low", "size": 322}
+        ]
+      },
+      {
+        "name": "NOTIFIED",
+        "children": [
+          {"name": "high", "size": 883},
+          {"name": "med", "size": 132},
+          {"name": "low", "size": 1066}
+        ]
+      },
+      {
+        "name": "INTEGRATED",
+        "children": [
+          {"name": "high", "size": 883},
+          {"name": "med", "size": 132},
+          {"name": "low", "size": 416}
+        ]
+      },
+      {
+        "name": "DELIVERED",
+        "children": [
+          {"name": "high", "size": 170},
+          {"name": "med", "size": 701},
+          {"name": "low", "size": 410}
+        ]
+      },
+      {
+        "name": "ESCALATED",
+        "children": [
+          {"name": "high", "size": 170},
+          {"name": "med", "size": 701},
+          {"name": "low", "size": 410}
+        ]
+      },
+      {
+        "name": "COMMITTED",
+        "children": [
+          {"name": "high", "size": 170},
+          {"name": "med", "size": 701},
+          {"name": "low", "size": 410}
+        ]
+      },
+      {
+        "name": "VERIFIED",
+        "children": [
+          {"name": "high", "size": 170},
+          {"name": "med", "size": 701},
+          {"name": "low", "size": 410}
+        ]
+      },
+      {
+        "name": "SUBMITTED",
+        "children": [
+          {"name": "high", "size": 170},
+          {"name": "med", "size": 701},
+          {"name": "low", "size": 410}
+        ]
+      }
+    ]
+  }
+  console.log(root);
+  // set width, height, and radius
+  var width = 650,
+          height = 475,
+          radius = (Math.min(width, height) / 2) - 10; // lowest number divided by 2. Then subtract 10
+  // legend dimensions
+  var legendRectSize = 15; // defines the size of the colored squares in legend
+  var legendSpacing = 6; // defines spacing between squares
+  var formatNumber = d3.format(",d"); // formats floats
+  var x = d3.scaleLinear() // continuous scale. preserves proportional differences
+          .range([0, 2 * Math.PI]); // setting range from 0 to 2 * circumference of a circle
+  var y = d3.scaleSqrt() // continuous power scale
+          .range([0, radius]); // setting range from 0 to radius
+  // setting color scheme
+  var color = {
+    'TOTAL': '#FFF',
+    'UNASSIGNED': '#DADFE1',
+    'ASSIGNED_TO_EDITOR': '#5BCAFF',
+    'ATTACHED': '#87D37C',
+    'ASSIGNED_TO_MENTOR': '#F64747',
+    'ASSIGNED_TO_REVIEWER': '#7BDDDD',
+    'ASSIGNED_TO_APPROVER': '#1e90ff',
+    'INTEGRATION_FAILED': '#F1A9A0',
+    'DELIVERED': '#4183D7',
+    'INTEGRATED': '#90C695',
+    'PUBLISHED': '#E4F1FE',
+    'COMMIT_FAILED': '#F62459',
+    'NOTIFIED': '#4ECDC4',
+    'BLOCKED': '#D24D57',
+    'ESCALATED': '#DB0A5B',
+    'SUBMITTED': '#86a531',
+    'REVIEWED': '#bfba00',
+    'APPROVED': '#C86DEF',
+    'ASSIGNED_TO_VERIFIER': '#D2527F',
+    'COMMITTED': '#5AD427',
+    'VERIFIED': '#81CFE0',
+    'CLOSED': '#CF000F'
+  };
+  var partition = d3.partition(); // subdivides layers
+  // define arcs
+  var arc = d3.arc()
+          .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x0))); })
+          .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x1))); })
+          .innerRadius(function(d) { return Math.max(0, y(d.y0)); })
+          .outerRadius(function(d) { return Math.max(0, y(d.y1)); });
+  // define tooltip
+  var tooltip = d3.select('body') // select element in the DOM with id 'chart'
+          .append('div').classed('tooltip', true); // append a div element to the element we've selected
+  tooltip.append('div') // add divs to the tooltip defined above
+          .attr('class', 'label'); // add class 'label' on the selection
+  tooltip.append('div') // add divs to the tooltip defined above
+          .attr('class', 'count'); // add class 'count' on the selection
+  tooltip.append('div') // add divs to the tooltip defined above
+          .attr('class', 'percent'); // add class 'percent' on the selection
+  // define SVG element
+  var svg = d3.select("#chart").append("svg")
+          .attr("width", width) // set width
+          .attr("height", height) // set height
+          .append("g") // append g element
+          .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
+  root = d3.hierarchy(root);
+  root.sum(function(d) { return d.size; });// must call sum on the hierarchy first
+  var path = svg.selectAll("path")
+          .data(partition(root).descendants()) // path for each descendant
+          .enter().append("path")
+          .attr("d", arc) // draw arcs
+          .style("fill", function (d) { return color[(d.children ? d : d.parent).data.name]; })
+          .on("click", click)
+          // mouse event handlers are attached to path so they need to come after its definition
+          .on('mouseover', function(d) {  // when mouse enters div
+            var total = d.data.size || d.value;
+            var percent = Math.round(1000 * d.value / total) / 10; // calculate percent
+            tooltip.select('.label').html(d.data.name); // set current label
+            tooltip.select('.count').html(total); // set current count
+            tooltip.select('.percent').html(percent + '%'); // set percent calculated above
+            tooltip.style('display', 'block'); // set display
+          })
+          .on('mouseout', function() { // when mouse leaves div
+            tooltip.style('display', 'none'); // hide tooltip for that element
+          })
+          .on('mousemove', function(d) { // when mouse moves
+            tooltip.style('top', (d3.event.layerY + 10) + 'px') // always 10px below the cursor
+                    .style('left', (d3.event.layerX + 10) + 'px'); // always 10px to the right of the mouse
+          })
+  // .append("title")
+  //   .text(function(d) { return d.data.name + "\n" + formatNumber(d.value);
+  // });
+  function click(d) {
+    svg.transition()
+            .duration(750)
+            .tween("scale", function() {
+              var xd = d3.interpolate(x.domain(), [d.x0, d.x1]),
+                      yd = d3.interpolate(y.domain(), [d.y0, 1]),
+                      yr = d3.interpolate(y.range(), [d.y0 ? 20 : 0, radius]);
+              return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); };
+            })
+            .selectAll("path")
+            .attrTween("d", function(d) { return function() { return arc(d); }; });
+  }
+  d3.select(self.frameElement).style("height", height + "px");
+  // Legends HTML
+  var legendContainer = d3.select("#legend").append("div").classed('legends clearfix', true);
+  var legend = legendContainer.selectAll('.legend') // selecting elements with class 'legend'
+          .data(d3.entries(color)) // refers to an array of labels from our dataset
+          .enter() // creates placeholder
+          .append('div') // replace placeholders with g elements
+          .attr('class', 'legend') // each g is given a legend class
+  // adding colored squares to legend
+  legend.append('div').classed('rect', true) // append rectangle squares to legend
+          .style('background-color', function (d) { return color[d.key]; }) // each fill is passed a color
+          .style('border', function (d) { return '1px solid ' + color[d.key]; }) // each fill is passed a color
+          .on('click', function(d) {
+            if(d3.select(this).classed('clicked')) {
+              d3.select(this).classed('clicked', false)
+                      .style('background-color', function(d) { return color[d.key]; });
+              // filter data and rerender
+            } else {
+              d3.select(this).classed('clicked', true)
+                      .style('background-color', 'transparent');
+              // filter data and rerender
+            }
+          })
+  // adding text to legend
+  legend.append('span')
+          .text(function(d) { return d.key; }); // return label
+  // define legend element
+  function getRootmostAncestorByWhileLoop(node) {
+    while (node.depth > 1) node = node.parent;
+    return node;
+  }
+</script>
+</body>
+</html>
