@@ -1,0 +1,40 @@
+.containerPallet{
+    font-family: sans-serif;
+    text-align: center;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+    margin-top: 50px;
+}
+p {
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 15px;
+    margin: 0px;
+}
+#id1{
+    background-color: #DD2E2E;
+}
+#id2{
+    background-color: #A00C0C ;
+}
+#id3{
+    background-color: #5C0808;
+}
+#id5{
+    background-color: #188518 ;
+}
+#id6{
+    background-color: #519B57 ;
+}
+#id7{
+    background-color: #63C668;
+}
+#id4{
+    background-color: grey;
+}
