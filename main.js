@@ -1,5 +1,5 @@
 var formdata = new FormData();
-        formdata.append("market", "KMIALLSHR");
+formdata.append("market", "KMIALLSHR");
 
         var requestOptions = {
             method: 'POST',
@@ -17,7 +17,7 @@ var formdata = new FormData();
         );
 
         const sunApiData = (data) => {
-            //console.log(data)
+            // console.log(data);
 
             for (var i = 0; i < data.data.length; i++) {
                 (data.data[i].stock_sector_name) = (data.data[i].stock_sector_name).substring(0, 10)
