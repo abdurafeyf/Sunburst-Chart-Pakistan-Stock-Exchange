@@ -10,8 +10,11 @@ formdata.append("market", "KMIALLSHR");
         fetch("https://sarmaaya.pk/api_prod/3.0/indice_sector_stocks_contributors.php",
             requestOptions)
             .then(response => response.json())
-            .then(data => sunApiData(data)
-
+            .then(
+                data => {
+                    sunApiData(data);
+                    console.log(data);
+                }
             ).catch(error =>
             console.log('error', error)
         );
