@@ -1,5 +1,5 @@
 var formdata = new FormData();
-formdata.append("market", "KSE100");
+formdata.append("market", "KMIALLSHR");
 
 var requestOptions = {
     method: 'POST',
